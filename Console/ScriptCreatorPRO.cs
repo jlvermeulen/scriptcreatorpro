@@ -10,8 +10,10 @@ namespace ScriptCreatorPRO
         {
             StreamWriter writer = new StreamWriter(Path.GetDirectoryName(script) + "\\audio.bat");
             string endian = bigEndian ? "big" : "little";
-            
-            int partCount = 0;
+
+            writer.WriteLine("flac --fast --endian=" + endian + " --sign=" + (signed ? "signed" : "unsigned") + " --bps=" + bps + " --sample-rate=" + sample + " --channels=" + channels + " -f -o temp.flac audio.pcm");
+            writer.Write("mkvmerge -o audio.mka --split parts:");
+
             int startTime;
             for (int i = 0; i < parts.Length; i++)
             {
@@ -21,21 +23,17 @@ namespace ScriptCreatorPRO
                     while (i < parts.Length - 1 && parts[i + 1].Enabled && parts[i].EndFrame == parts[i + 1].StartFrame - 1)
                         i++;
 
-                    writer.WriteLine("flac --fast --skip=" + FrameToTimeStamp(startTime, framerate) + " --until=" + FrameToTimeStamp(parts[i].EndFrame + 1, framerate) +
-                        " --endian=" + endian + " --sign=" + (signed ? "signed" : "unsigned") + " --bps=" + bps + " --sample-rate=" + sample + " --channels=" + channels +
-                        " -f -o part" + partCount++ + ".flac audio.pcm");
+                    writer.Write(FrameToTimeStamp(startTime, framerate) + "-" + FrameToTimeStamp(parts[i].EndFrame + 1, framerate));
+
+                    if (i < parts.Length - 1)
+                        writer.Write(",+");
                 }
             }
 
-            for (int i = 0; i < partCount; i++)
-                writer.WriteLine("eac3to part" + i + ".flac part" + i + ".pcm");
+            writer.WriteLine(" temp.flac");
+            writer.WriteLine("eac3to audio.mka temp.pcm");
 
-            writer.Write("eac3to ");
-            for (int i = 0; i < partCount; i++)
-                writer.Write("part"+i+".pcm" + (i == partCount - 1 ? " " : "+"));
-            writer.WriteLine("parts.pcm -" + channels + " -" + endian + " -" + sample + " -" + bps);
-
-            writer.WriteLine("flac --best --endian=" + endian + " --sign=" + (signed ? "signed" : "unsigned") + " --bps=" + bps + " --sample-rate=" + sample + " --channels=" + channels + " -f -o audio.flac parts.pcm");
+            writer.WriteLine("flac --best --endian=" + endian + " --sign=" + (signed ? "signed" : "unsigned") + " --bps=" + bps + " --sample-rate=" + sample + " --channels=" + channels + " -f -o audio.flac temp.pcm");
 
             if (aac)
             {
@@ -45,15 +43,10 @@ namespace ScriptCreatorPRO
                 writer.WriteLine("del \"audio.wav\"");
             }
 
-            for (int i = 0; i < partCount; i++)
-            {
-                writer.WriteLine("del \"part" + i + " - Log.txt\"");
-                writer.WriteLine("del \"part" + i + ".pcm\"");
-                writer.WriteLine("del \"part" + i + ".flac\"");
-            }
-
-            writer.WriteLine("del \"parts - Log.txt\"");
-            writer.WriteLine("del \"parts.pcm\"");
+            writer.WriteLine("del \"temp - Log.txt\"");
+            writer.WriteLine("del \"temp.pcm\"");
+            writer.WriteLine("del \"temp.flac\"");
+            writer.WriteLine("del \"audio.mka\"");
             writer.WriteLine("pause");
 
             writer.Close();
@@ -148,11 +141,12 @@ namespace ScriptCreatorPRO
         {
             decimal totalSeconds = (frame * 1001m) / framerate;
 
+            int hours = (int)Math.Truncate(totalSeconds / 3600);
             int minutes = (int)Math.Truncate(totalSeconds / 60);
             int seconds = (int)Math.Truncate(totalSeconds % 60);
-            int milliseconds = (int)Math.Truncate((totalSeconds % 1) * 1000);
+            int nanoseconds = (int)Math.Truncate((totalSeconds % 1) * 1000000000);
 
-            return minutes.ToString("00") + ":" + seconds.ToString("00") + "." + milliseconds.ToString("000");
+            return hours.ToString("00") + ":" + minutes.ToString("00") + ":" + seconds.ToString("00") + "." + nanoseconds.ToString("000000000");
         }
     }
 
