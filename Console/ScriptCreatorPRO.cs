@@ -15,6 +15,7 @@ namespace ScriptCreatorPRO
             writer.Write("mkvmerge -o audio.mka --split parts:");
 
             int startTime;
+            bool first = true;
             for (int i = 0; i < parts.Length; i++)
             {
                 if (parts[i].Enabled)
@@ -23,10 +24,12 @@ namespace ScriptCreatorPRO
                     while (i < parts.Length - 1 && parts[i + 1].Enabled && parts[i].EndFrame == parts[i + 1].StartFrame - 1)
                         i++;
 
-                    writer.Write(FrameToTimeStamp(startTime, framerate) + "-" + FrameToTimeStamp(parts[i].EndFrame + 1, framerate));
-
-                    if (i < parts.Length - 1)
+                    if (!first)
                         writer.Write(",+");
+                    else
+                        first = false;
+
+                    writer.Write(FrameToTimeStamp(startTime, framerate) + "-" + FrameToTimeStamp(parts[i].EndFrame + 1, framerate));
                 }
             }
 
