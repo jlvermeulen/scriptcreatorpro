@@ -26,7 +26,7 @@ namespace GUI
                 this.partsList.Items.Clear();
 
                 foreach (Part p in this.parts)
-                    this.partsList.Items.Add(p.Name + " (" + p.StartFrame + "," + p.EndFrame + ")", p.Enabled);
+                    this.partsList.Items.Add(p.Name + " (" + p.StartFrame + "," + p.EndFrame + ")" + (!p.Enabled ? " (" + (p.SUID != ScriptCreator.DEFAULT_UID ? "SUID: " + p.SUID : "No SUID specified") + ")" : ""), p.Enabled);
 
                 this.scriptPath.Modified = false;
             }

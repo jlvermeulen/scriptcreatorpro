@@ -6,6 +6,10 @@ namespace ScriptCreatorPRO
 {
     public static class ScriptCreator
     {
+        public const string DEFAULT_UID = "0123456789abcdef0123456789abcdef";
+
+        private static Random random = new Random();
+
         public static void CreateAudio(Part[] parts, string script, int framerate, bool bigEndian, bool signed, int bps, int sample, int channels, bool aac, int aacRate)
         {
             StreamWriter writer = new StreamWriter(Path.GetDirectoryName(script) + "\\audio.bat");
@@ -79,6 +83,7 @@ namespace ScriptCreatorPRO
             writer.WriteLine("  <EditionEntry>");
             writer.WriteLine("    <EditionFlagHidden>0</EditionFlagHidden>");
             writer.WriteLine("    <EditionFlagDefault>0</EditionFlagDefault>");
+            writer.WriteLine("    <EditionUID>" + RandomUID() + "</EditionUID>");
 
             int current = 0;
             foreach (Part p in parts)
@@ -88,7 +93,9 @@ namespace ScriptCreatorPRO
                 writer.WriteLine("      <ChapterFlagEnabled>1</ChapterFlagEnabled>");
 
                 if (!p.Enabled)
-                    writer.WriteLine("      <ChapterSegmentUID format=\"hex\">00000000000000000000000000000000</ChapterSegmentUID>");
+                    writer.WriteLine("      <ChapterSegmentUID format=\"hex\">" + p.SUID + "</ChapterSegmentUID>");
+                else
+                    writer.WriteLine("      <ChapterUID>" + RandomUID() + "</ChapterUID>");
 
                 writer.WriteLine("      <ChapterDisplay>");
                 writer.WriteLine("        <ChapterString>" + p.Name + "</ChapterString>");
@@ -113,18 +120,32 @@ namespace ScriptCreatorPRO
             List<Part> parts = new List<Part>();
 
             string line;
-            int trim;
+            int trim, chapterCount = 0;
             while ((line = reader.ReadLine()) != null)
             {
                 string l = line.ToLowerInvariant();
                 if ((trim = l.IndexOf("trim")) != -1)
                 {
-                    int open = l.IndexOf('(', trim);
-                    int close = l.IndexOf(')', open);
-                    string se = l.Substring(open + 1, close - open - 1);
+                    int open = line.IndexOf('(', trim);
+                    int close = line.IndexOf(')', open);
+                    string se = line.Substring(open + 1, close - open - 1);
                     string[] startEnd = se.Split(',');
+                    
+                    string comment, name = "Chapter" + ++chapterCount, suid = DEFAULT_UID;
+                    if (line.IndexOf('#') != -1)
+                    {
+                        comment = line.Split('#')[1].Trim();
+                        if (comment.IndexOf('|') != -1)
+                        {
+                            string[] split = comment.Split('|');
+                            name = split[0].Trim();
+                            suid = split[1].Trim();
+                        }
+                        else
+                            name = comment;
+                    }
 
-                    parts.Add(new Part(line.Split('=')[0].Trim(), line.Split('#')[1].Trim(), int.Parse(startEnd[0]), int.Parse(startEnd[1])));
+                    parts.Add(new Part(line.Split('=')[0].Trim(), name, int.Parse(startEnd[0]), int.Parse(startEnd[1]), suid));
                 }
                 else if (line.Contains("+"))
                 {
@@ -151,17 +172,20 @@ namespace ScriptCreatorPRO
 
             return hours.ToString("00") + ":" + minutes.ToString("00") + ":" + seconds.ToString("00") + "." + nanoseconds.ToString("000000000");
         }
+
+        private static string RandomUID() { return random.Next(1, 10000).ToString() + random.Next(1, 10000).ToString() + random.Next(1, 10000).ToString() + random.Next(1, 10000).ToString() + random.Next(1, 10000).ToString(); }
     }
 
     public class Part
     {
-        public Part(string scriptName, string name, int start, int end)
+        public Part(string scriptName, string name, int start, int end, string suid)
         {
             this.ScriptDesignation = scriptName;
             this.Name = name;
             this.StartFrame = start;
             this.EndFrame = end;
             this.Enabled = false;
+            this.SUID = suid;
         }
 
         public string ScriptDesignation { get; private set; }
@@ -169,5 +193,6 @@ namespace ScriptCreatorPRO
         public int StartFrame { get; private set; }
         public int EndFrame { get; private set; }
         public bool Enabled { get; set; }
+        public string SUID { get; private set; }
     }
 }
