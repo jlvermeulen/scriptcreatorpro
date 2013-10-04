@@ -99,7 +99,7 @@ namespace ScriptCreatorPRO
 
                 writer.WriteLine("      <ChapterDisplay>");
                 writer.WriteLine("        <ChapterString>" + p.Name + "</ChapterString>");
-                writer.WriteLine("        <ChapterLanguage>jap</ChapterLanguage>");
+                writer.WriteLine("        <ChapterLanguage>jpn</ChapterLanguage>");
                 writer.WriteLine("      </ChapterDisplay>");
                 writer.WriteLine("      <ChapterTimeStart>" + FrameToTimeStamp(p.Enabled ? current : 0, framerate) + "</ChapterTimeStart>");
                 writer.WriteLine("    </ChapterAtom>");
@@ -173,7 +173,7 @@ namespace ScriptCreatorPRO
             return hours.ToString("00") + ":" + minutes.ToString("00") + ":" + seconds.ToString("00") + "." + nanoseconds.ToString("000000000");
         }
 
-        private static string RandomUID() { return random.Next(1, 10000).ToString() + random.Next(1, 10000).ToString() + random.Next(1, 10000).ToString() + random.Next(1, 10000).ToString() + random.Next(1, 10000).ToString(); }
+        private static string RandomUID() { return random.Next(1, 10000).ToString() + random.Next(1, 10000).ToString() + random.Next(1, 10000).ToString() + random.Next(1, 10000).ToString(); }
     }
 
     public class Part
