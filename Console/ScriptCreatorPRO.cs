@@ -6,11 +6,11 @@ namespace ScriptCreatorPRO
 {
     public static class ScriptCreator
     {
-        public const string DEFAULT_UID = "0123456789abcdef0123456789abcdef";
+        public const string DEFAULT_UID = "0123456789abcdef";
 
         private static Random random = new Random();
 
-        public static void CreateAudio(Part[] parts, string script, int framerate, bool bigEndian, bool signed, int bps, int sample, int channels, bool aac, int aacRate)
+        public static void CreateAudio(Part[] parts, string script, int framerate, bool bigEndian, bool signed, int bps, int sample, int channels, int delay, bool aac, int aacRate)
         {
             StreamWriter writer = new StreamWriter(Path.GetDirectoryName(script) + "\\audio.bat");
             string endian = bigEndian ? "big" : "little";
@@ -33,7 +33,7 @@ namespace ScriptCreatorPRO
                     else
                         first = false;
 
-                    writer.Write(FrameToTimeStamp(startTime, framerate) + "-" + FrameToTimeStamp(parts[i].EndFrame + 1, framerate));
+                    writer.Write(FrameToTimeStamp(startTime, framerate, delay) + "-" + FrameToTimeStamp(parts[i].EndFrame + 1, framerate, delay));
                 }
             }
 
@@ -161,9 +161,9 @@ namespace ScriptCreatorPRO
             return parts.ToArray();
         }
 
-        private static string FrameToTimeStamp(int frame, int framerate)
+        private static string FrameToTimeStamp(int frame, int framerate, int delay = 0)
         {
-            decimal totalSeconds = (frame * 1001m) / framerate;
+            decimal totalSeconds = (frame * 1001m) / framerate - delay / 1000m;
 
             int hours = (int)Math.Truncate(totalSeconds / 3600);
             int minutes = (int)Math.Truncate(totalSeconds / 60);

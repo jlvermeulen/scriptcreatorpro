@@ -12,6 +12,7 @@ namespace ScriptCreatorPRO
             {"sample-rate", null},
             {"channels", null},
             {"framerate", null},
+            {"delay", "0"},
             {"aac-rate", "192000"}
         };
 
@@ -52,7 +53,8 @@ namespace ScriptCreatorPRO
             {
                 Console.WriteLine("Generating audio.bat...");
                 ScriptCreator.CreateAudio(parts, arguments["input"], int.Parse(arguments["framerate"]), arguments.ContainsKey("big"), arguments.ContainsKey("signed"),
-                    int.Parse(arguments["bps"]), int.Parse(arguments["sample-rate"]), int.Parse(arguments["channels"]), arguments.ContainsKey("aac"), int.Parse(arguments["aac-rate"]));
+                    int.Parse(arguments["bps"]), int.Parse(arguments["sample-rate"]), int.Parse(arguments["channels"]), int.Parse(arguments["delay"]),
+                    arguments.ContainsKey("aac"), int.Parse(arguments["aac-rate"]));
             }
 
             if (arguments.ContainsKey("qpfile") || arguments.ContainsKey("all"))

@@ -45,7 +45,7 @@ namespace GUI
             Process p = new Process();
             p.StartInfo.FileName = "ScriptCreatorPRO.exe";
             p.StartInfo.Arguments = "--all --input \"" + this.scriptPath.Text + "\" --framerate " + (int)this.framerate.Value + " --bps " + (int)this.bps.Value + " --sample-rate " + (int)this.sampleRate.Value +
-                " --channels " + (int)this.channels.Value + (this.bigEndian.Checked ? " --big " : "") + (this.signed.Checked ? " --signed " : "") +
+                " --channels " + (int)this.channels.Value + " --delay " + (int)this.audioDelay.Value + (this.bigEndian.Checked ? " --big " : "") + (this.signed.Checked ? " --signed " : "") +
                 (this.aac.Checked ? " --aac --aac-rate " + (int)this.aacRate.Value : "");
             p.StartInfo.CreateNoWindow = true;
             p.StartInfo.RedirectStandardOutput = true;
@@ -67,7 +67,7 @@ namespace GUI
             Process p = new Process();
             p.StartInfo.FileName = "ScriptCreatorPRO.exe";
             p.StartInfo.Arguments = "--audio --input \"" + this.scriptPath.Text + "\" --framerate " + (int)this.framerate.Value + " --bps " + (int)this.bps.Value + " --sample-rate " + (int)this.sampleRate.Value +
-                " --channels " + (int)this.channels.Value + (this.bigEndian.Checked ? " --big " : "") + (this.signed.Checked ? " --signed " : "") +
+                " --channels " + (int)this.channels.Value + " --delay " + (int)this.audioDelay.Value + (this.bigEndian.Checked ? " --big " : "") + (this.signed.Checked ? " --signed " : "") +
                 (this.aac.Checked ? " --aac --aac-rate " + (int)this.aacRate.Value : "");
             p.StartInfo.CreateNoWindow = true;
             p.StartInfo.RedirectStandardOutput = true;
