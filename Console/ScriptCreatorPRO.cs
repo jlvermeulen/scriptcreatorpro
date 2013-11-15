@@ -166,7 +166,7 @@ namespace ScriptCreatorPRO
             decimal totalSeconds = (frame * 1001m) / framerate - delay / 1000m;
 
             int hours = (int)Math.Truncate(totalSeconds / 3600);
-            int minutes = (int)Math.Truncate(totalSeconds / 60);
+            int minutes = (int)Math.Truncate((totalSeconds % 3600) / 60);
             int seconds = (int)Math.Truncate(totalSeconds % 60);
             int nanoseconds = (int)Math.Truncate((totalSeconds % 1) * 1000000000);
 
