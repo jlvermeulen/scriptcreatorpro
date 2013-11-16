@@ -15,7 +15,7 @@ namespace ScriptCreatorPRO
             StreamWriter writer = new StreamWriter(Path.GetDirectoryName(script) + "\\audio.bat");
             string endian = bigEndian ? "big" : "little";
 
-            writer.WriteLine("flac --fast --endian=" + endian + " --sign=" + (signed ? "signed" : "unsigned") + " --bps=" + bps + " --sample-rate=" + sample + " --channels=" + channels + " -f -o temp.flac audio.pcm");
+            writer.WriteLine("eac3to audio.pcm temp.wav -" + channels + " -" + bps + " -" + sample + " -" + (bigEndian ? "big" : "little"));
             writer.Write("mkvmerge -o audio.mka --split parts:");
 
             int startTime;
@@ -37,7 +37,7 @@ namespace ScriptCreatorPRO
                 }
             }
 
-            writer.WriteLine(" temp.flac");
+            writer.WriteLine(" temp.wav");
             writer.WriteLine("eac3to audio.mka temp.pcm");
 
             writer.WriteLine("flac --best --endian=" + endian + " --sign=" + (signed ? "signed" : "unsigned") + " --bps=" + bps + " --sample-rate=" + sample + " --channels=" + channels + " -f -o audio.flac temp.pcm");
@@ -52,7 +52,7 @@ namespace ScriptCreatorPRO
 
             writer.WriteLine("del \"temp - Log.txt\"");
             writer.WriteLine("del \"temp.pcm\"");
-            writer.WriteLine("del \"temp.flac\"");
+            writer.WriteLine("del \"temp.wav\"");
             writer.WriteLine("del \"audio.mka\"");
             writer.WriteLine("pause");
 
